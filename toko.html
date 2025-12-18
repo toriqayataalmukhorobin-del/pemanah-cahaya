@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="id" class="h-full">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toko Online Modern</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+/* === STYLE KAMU (UTUH) === */
+body { box-sizing: border-box; }
+
+@keyframes float { 0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)} }
+@keyframes slide-up { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
+
+.float-animation{animation:float 6s ease-in-out infinite}
+.card-modern{backdrop-filter:blur(20px);background:rgba(255,255,255,.95)}
+.input-modern:focus{transform:translateY(-2px)}
+.btn-modern{transition:.3s}
+.btn-modern:hover{transform:translateY(-3px)}
+.form-section{animation:slide-up .5s ease backwards}
+.form-section:nth-child(n){animation-delay:.1s}
+.gradient-text {
+  background: linear-gradient(135deg, #a855f7, #6366f1);
+  background-clip: text;          /* standard */
+  -webkit-background-clip: text;  /* chrome, safari */
+  color: transparent;             /* fallback */
+  -webkit-text-fill-color: transparent;
+}
+
+</style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-indigo-600 flex items-center justify-center p-4">
+
+<div class="card-modern w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
+
+<!-- HEADER -->
+<div class="p-8 bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 text-white text-center">
+  <div class="text-5xl mb-3 float-animation">🛒</div>
+  <h1 class="text-3xl font-bold">Toko Online</h1>
+  <p class="text-sm opacity-90">Pesan cepat & langsung ke WhatsApp</p>
+</div>
+
+<!-- FORM -->
+<div class="p-8 space-y-6">
+
+<input id="nama" class="input-modern w-full border rounded-2xl px-5 py-3" placeholder="👤 Nama kamu">
+<textarea id="alamat" class="input-modern w-full border rounded-2xl px-5 py-3" rows="2" placeholder="📍 Alamat lengkap"></textarea>
+
+<select id="produk" class="input-modern w-full border rounded-2xl px-5 py-3"></select>
+
+<div class="flex items-center justify-center gap-4">
+  <button onclick="ubahQty(-1)" class="w-12 h-12 rounded-xl bg-gray-200 font-bold">−</button>
+  <input id="jumlah" type="number" value="1" min="1" class="w-20 text-center border rounded-xl py-2">
+  <button onclick="ubahQty(1)" class="w-12 h-12 rounded-xl bg-gray-200 font-bold">+</button>
+</div>
+
+<select id="bayar" class="input-modern w-full border rounded-2xl px-5 py-3">
+  <option>COD</option>
+  <option>Transfer</option>
+  <option>QRIS</option>
+</select>
+
+<input id="catatan" class="input-modern w-full border rounded-2xl px-5 py-3" placeholder="📝 Catatan">
+
+<div class="flex justify-between items-center bg-purple-100 rounded-2xl p-4">
+  <span class="font-bold">Total</span>
+  <span id="total" class="gradient-text font-bold text-2xl">Rp 0</span>
+</div>
+
+<button onclick="kirimWA()" class="btn-modern w-full py-5 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-lg">
+  💬 Pesan via WhatsApp
+</button>
+
+</div>
+</div>
+
+<script>
+// ================= DATA =================
+const menu = [
+  { nama:"Es Teh Manis", harga:3000 },
+  { nama:"Kopi Susu", harga:5000 },
+  { nama:"Roti Bakar", harga:7000 },
+  { nama:"Mie Goreng", harga:12000 }
+];
+
+// ================= INIT =================
+const produk = document.getElementById("produk");
+const jumlah = document.getElementById("jumlah");
+const total = document.getElementById("total");
+
+produk.innerHTML = `<option value="">-- Pilih Produk --</option>`;
+menu.forEach((p,i)=>{
+  produk.innerHTML += `<option value="${i}">${p.nama} • Rp${p.harga.toLocaleString("id-ID")}</option>`;
+});
+
+// ================= TOTAL =================
+function hitungTotal(){
+  if(produk.value===""){ total.textContent="Rp 0"; return }
+  total.textContent="Rp "+(menu[produk.value].harga*jumlah.value).toLocaleString("id-ID");
+}
+produk.onchange=hitungTotal;
+jumlah.oninput=hitungTotal;
+
+function ubahQty(x){
+  jumlah.value=Math.max(1,parseInt(jumlah.value)+x);
+  hitungTotal();
+}
+
+// ================= WA =================
+function kirimWA(){
+  const nama=document.getElementById("nama").value;
+  const alamat=document.getElementById("alamat").value;
+  if(!nama||!alamat||produk.value===""){
+    alert("Lengkapi data dulu 🙏");
+    return;
+  }
+
+  const p=menu[produk.value];
+  const qty=jumlah.value;
+  const kode="ORD-"+Date.now();
+  const waktu=new Date().toLocaleString("id-ID");
+
+  const pesan=`🧾 *PESANAN BARU*
+
+🆔 ${kode}
+🕒 ${waktu}
+
+👤 ${nama}
+📍 ${alamat}
+
+🛍️ ${p.nama}
+📦 ${qty}
+💰 Rp ${(p.harga*qty).toLocaleString("id-ID")}
+💳 ${document.getElementById("bayar").value}
+📝 ${document.getElementById("catatan").value||"-"}
+
+Terima kasih 🙏`;
+
+  const wa="628886192492"; // GANTI NOMOR
+  window.open(`https://wa.me/${wa}?text=${encodeURIComponent(pesan)}`);
+}
+</script>
+
+</body>
+</html>
